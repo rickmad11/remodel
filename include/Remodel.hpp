@@ -21,8 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef REMODEL_REMODEL_HPP
-#define REMODEL_REMODEL_HPP
+#pragma once
 
 /**     
  * @file
@@ -273,14 +272,6 @@
 /// a pointer to a wrapped entity to a function or receive one in a callback without using `void*`
 /// everywhere, thus keeping your code type-safe. You can create a strong wrapper from a weak one
 /// via `myWeakWrapper.toStrong()`.
-
-#include <functional>
-#include <stdint.h>
-#include <cstddef>
-
-#include "zycore/Operators.hpp"
-#include "zycore/Utils.hpp"
-#include "zycore/Optional.hpp"
 
 #include "Platform.hpp"
 
@@ -1322,75 +1313,114 @@ class FunctionImpl
  * @brief   A macro that defines a function implementation for a given calling convention.
  * @param   callingConv The calling convention.
  */
-#define REMODEL_DEF_FUNCTION(callingConv)                                                          \
-    template<typename RetT, typename... ArgsT>                                                     \
-    class FunctionImpl<RetT (callingConv*)(ArgsT...)>                                              \
-        : public internal::FieldBase                                                               \
-    {                                                                                              \
-    protected:                                                                                     \
-        using FunctionPtr = RetT(callingConv*)(ArgsT...);                                          \
-    public:                                                                                        \
-        explicit FunctionImpl(PtrGetter ptrGetter)                                                 \
-            : FieldBase{nullptr, ptrGetter}                                                        \
-        {}                                                                                         \
-                                                                                                   \
-        FunctionPtr get() const                                                                    \
-        {                                                                                          \
-            return (FunctionPtr)this->crawPtr();                                                   \
-        }                                                                                          \
-                                                                                                   \
-        RetT operator () (ArgsT... args) const                                                     \
-        {                                                                                          \
-            return get()(args...);                                                                 \
-        }                                                                                          \
+template<typename RetT, typename... ArgsT>
+class FunctionImpl<RetT(*)(ArgsT...)>
+    : public internal::FieldBase
+{
+protected:
+    using FunctionPtr = RetT(__fastcall*)(ArgsT...);
+    using FunctionPtr_stdcall = RetT(__stdcall*)(ArgsT...);
+    using FunctionPtr_vectorcall = RetT(__vectorcall*)(ArgsT...);
+    using FunctionPtr_cdecl = RetT(__cdecl*)(ArgsT...);
+    using FunctionPtr_thiscall = RetT(__thiscall*)(ArgsT...);
+public:
+    explicit FunctionImpl(PtrGetter ptrGetter)
+        : FieldBase{ nullptr, ptrGetter }
+    {
     }
+
+    template <typename T = FunctionPtr>
+    T get() const
+    {
+        return (T)this->crawPtr();
+    }
+
+    RetT operator () (ArgsT... args) const
+    {
+        if constexpr (sizeof(void*) == 4)
+            return get<FunctionPtr_cdecl>()(args...);
+        else
+			return get()(args...);
+    }
+
+    RetT stdcall(ArgsT... args) const
+    {
+        return get<FunctionPtr_stdcall>()(args...);
+    }
+
+    RetT fastcall(ArgsT... args) const
+    {
+        return operator()(args...);
+    }
+
+    RetT vectorcall(ArgsT... args) const
+    {
+        return get<FunctionPtr_vectorcall>()(args...);
+    }
+
+    RetT cdeclcall(ArgsT... args) const
+    {
+        return get<FunctionPtr_cdecl>()(args...);
+    }
+
+    RetT thiscall(ArgsT... args) const
+    {
+        return get<FunctionPtr_thiscall>()(args...);
+    }
+};
 
 /**
  * @internal
  * @brief   A macro that defines a C-vararg function implementation for a given calling convention.
  * @param   callingConv The calling convention.
  */
-#define REMODEL_DEF_VARARG_FUNCTION(callingConv)                                                   \
-    template<typename RetT, typename... ArgsT>                                                     \
-    class FunctionImpl<RetT (callingConv*)(ArgsT..., ...)>                                         \
-        : public internal::FieldBase                                                               \
-    {                                                                                              \
-    protected:                                                                                     \
-        using FunctionPtr = RetT(callingConv*)(ArgsT..., ...);                                     \
-    public:                                                                                        \
-        explicit FunctionImpl(PtrGetter ptrGetter)                                                 \
-            : FieldBase{nullptr, ptrGetter}                                                        \
-        {}                                                                                         \
-                                                                                                   \
-        FunctionPtr get() const                                                                    \
-        {                                                                                          \
-            return (FunctionPtr)this->crawPtr();                                                   \
-        }                                                                                          \
-                                                                                                   \
-        template<typename... VarArgsT>                                                             \
-        RetT operator () (ArgsT... args, VarArgsT... va) const                                     \
-        {                                                                                          \
-            return get()(args..., va...);                                                          \
-        }                                                                                          \
+template<typename RetT, typename... ArgsT>
+class FunctionImpl<RetT(*)(ArgsT..., ...)>
+    : public internal::FieldBase
+{
+protected:
+    using FunctionPtr = RetT(__fastcall*)(ArgsT..., ...);
+    using FunctionPtr_vectorcall = RetT(__vectorcall*)(ArgsT..., ...);
+    using FunctionPtr_cdecl = RetT(__cdecl*)(ArgsT..., ...);
+public:
+    explicit FunctionImpl(PtrGetter ptrGetter)
+        : FieldBase{ nullptr, ptrGetter }
+    {
     }
 
-#ifdef ZYCORE_MSVC
-    REMODEL_DEF_FUNCTION(__cdecl);
-    REMODEL_DEF_FUNCTION(__stdcall);
-    REMODEL_DEF_FUNCTION(__thiscall);
-    REMODEL_DEF_FUNCTION(__fastcall);
-    REMODEL_DEF_FUNCTION(__vectorcall);
-    REMODEL_DEF_VARARG_FUNCTION(__cdecl);
-#elif defined(ZYCORE_GNUC)
-    REMODEL_DEF_FUNCTION(__attribute__((cdecl)));
-    //REMODEL_DEF_FUNCTION(__attribute__((stdcall)));
-    //REMODEL_DEF_FUNCTION(__attribute__((fastcall)));
-    //REMODEL_DEF_FUNCTION(__attribute__((thiscall)));
-    REMODEL_DEF_VARARG_FUNCTION(__attribute__((cdecl)));
-#endif
+    template <typename T = FunctionPtr>
+    T get() const
+    {
+        return (T)this->crawPtr();
+    }
 
-#undef REMODEL_DEF_FUNCTION
-#undef REMODEL_DEF_VARARG_FUNCTION
+    template<typename... VarArgsT>
+    RetT operator () (ArgsT... args, VarArgsT... va) const
+    {
+        if constexpr (sizeof(void*) == 4)
+            return get<FunctionPtr_cdecl>()(args..., va...);
+        else    
+            return get()(args..., va...);
+    }
+
+    template<typename... VarArgsT>
+    RetT fastcall(ArgsT... args, VarArgsT... va) const
+    {
+        return operator()(args..., va...);
+    }
+
+    template<typename... VarArgsT>
+    RetT vectorcall(ArgsT... args, VarArgsT... va) const
+    {
+        return get<FunctionPtr_vectorcall>()(args..., va...);
+    }
+
+    template<typename... VarArgsT>
+    RetT cdeclcall(ArgsT... args, VarArgsT... va) const
+    {
+        return get<FunctionPtr_cdecl>()(args..., va...);
+    }
+};
 
 } // namespace internal
 
@@ -1454,28 +1484,29 @@ class MemberFunctionImpl
  * @brief   A macro that defines a member-function implementation for a given calling convention.
  * @param   callingConv The calling convention.
  */
-#define REMODEL_DEF_MEMBER_FUNCTION(callingConv)                                                   \
-    template<typename RetT, typename... ArgsT>                                                     \
-    class MemberFunctionImpl<RetT (callingConv*)(ArgsT...)>                                        \
-        : public internal::FieldBase                                                               \
-    {                                                                                              \
-    protected:                                                                                     \
-        using FunctionPtr = RetT(callingConv*)(void* thiz, ArgsT... args);                         \
-    public:                                                                                        \
-        MemberFunctionImpl(ClassWrapper* parent, PtrGetter ptrGetter)                              \
-            : FieldBase{parent, ptrGetter}                                                         \
-        {}                                                                                         \
-                                                                                                   \
-        FunctionPtr get() const                                                                    \
-        {                                                                                          \
-            return (FunctionPtr)this->crawPtr();                                                   \
-        }                                                                                          \
-                                                                                                   \
-        RetT operator () (ArgsT... args) const                                                     \
-        {                                                                                          \
-            return get()(addressOfObj(*this->m_parent), args...);                                  \
-        }                                                                                          \
+template<typename RetT, typename... ArgsT>
+class MemberFunctionImpl<RetT(__thiscall*)(ArgsT...)>
+    : public internal::FieldBase
+{
+protected:
+    using FunctionPtr = RetT(__thiscall*)(void* thiz, ArgsT... args);
+public:
+    MemberFunctionImpl(ClassWrapper* parent, PtrGetter ptrGetter)
+        : FieldBase{ parent, ptrGetter }
+    {
     }
+
+    template <typename T = FunctionPtr>
+    T get() const
+    {
+        return (T)this->crawPtr();
+    }
+
+    RetT operator () (ArgsT... args) const
+    {
+        return get()(addressOfObj(*this->m_parent), args...);
+    }
+};
 
 /**
  * @internal
@@ -1483,47 +1514,30 @@ class MemberFunctionImpl
  *          convention.
  * @param   callingConv The calling convention.
  */
-#define REMODEL_DEF_VARARG_MEMBER_FUNCTION(callingConv)                                            \
-    template<typename RetT, typename... ArgsT>                                                     \
-    class MemberFunctionImpl<RetT (callingConv*)(ArgsT..., ...)>                                   \
-        : public internal::FieldBase                                                               \
-    {                                                                                              \
-    protected:                                                                                     \
-        using FunctionPtr = RetT(callingConv*)(void* thiz, ArgsT... args, ...);                    \
-    public:                                                                                        \
-        MemberFunctionImpl(ClassWrapper* parent, PtrGetter ptrGetter)                              \
-            : FieldBase{parent, ptrGetter}                                                         \
-        {}                                                                                         \
-                                                                                                   \
-        FunctionPtr get() const                                                                    \
-        {                                                                                          \
-            return (FunctionPtr)this->crawPtr();                                                   \
-        }                                                                                          \
-                                                                                                   \
-        template<typename... VarArgsT>                                                             \
-        RetT operator () (ArgsT... args, VarArgsT... va) const                                     \
-        {                                                                                          \
-            return get()(addressOfObj(*this->m_parent), args..., va...);                           \
-        }                                                                                          \
+template<typename RetT, typename... ArgsT>
+class MemberFunctionImpl<RetT(__cdecl*)(ArgsT..., ...)>
+    : public internal::FieldBase
+{
+protected:
+    using FunctionPtr = RetT(__cdecl*)(void* thiz, ArgsT..., ...);
+public:
+    MemberFunctionImpl(ClassWrapper* parent, PtrGetter ptrGetter)
+        : FieldBase{ parent, ptrGetter }
+    {
     }
 
-#ifdef ZYCORE_MSVC
-    REMODEL_DEF_MEMBER_FUNCTION(__cdecl);
-    REMODEL_DEF_MEMBER_FUNCTION(__stdcall);
-    REMODEL_DEF_MEMBER_FUNCTION(__thiscall);
-    REMODEL_DEF_MEMBER_FUNCTION(__fastcall);
-    REMODEL_DEF_MEMBER_FUNCTION(__vectorcall);
-    REMODEL_DEF_VARARG_MEMBER_FUNCTION(__cdecl);
-#elif defined(ZYCORE_GNUC)
-    REMODEL_DEF_MEMBER_FUNCTION(__attribute__((cdecl)));
-    //REMODEL_DEF_MEMBER_FUNCTION(__attribute__((stdcall)));
-    //REMODEL_DEF_MEMBER_FUNCTION(__attribute__((fastcall)));
-    //REMODEL_DEF_MEMBER_FUNCTION(__attribute__((thiscall)));
-    REMODEL_DEF_VARARG_MEMBER_FUNCTION(__attribute__((cdecl)));
-#endif
+    template <typename T = FunctionPtr>
+    T get() const
+    {
+        return (T)this->crawPtr();
+    }
 
-#undef REMODEL_DEF_MEMBER_FUNCTION
-#undef REMODEL_DEF_VARARG_MEMBER_FUNCTION
+    template<typename... VarArgsT>
+    RetT operator () (ArgsT... args, VarArgsT... va) const
+    {
+        return get()(addressOfObj(*this->m_parent), args..., va...);
+    }
+};
 
 } // namespace internal
 
@@ -1636,16 +1650,14 @@ public:
      * @param   moduleName  The name of the desired module.
      * @return  If found, the module, else an empty optional.
      */
-    static zycore::Optional<Module> getModule(const char* moduleName)
+    static std::optional<Module> getModule(const char* moduleName)
     {
-        auto modulePtr = platform::obtainModuleHandle(moduleName);
-        if (!modulePtr) return zycore::kEmpty;
-        return {zycore::kInPlace, wrapper_cast<Module>(modulePtr)};
+        auto modulePtr = GetModuleHandleA(moduleName);
+        if (!modulePtr) return std::nullopt;
+        return {wrapper_cast<Module>(modulePtr)};
     }
 };
 
 // ============================================================================================== //
 
 } // namespace remodel
-
-#endif // REMODEL_REMODEL_HPP

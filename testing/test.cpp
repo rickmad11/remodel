@@ -1,3 +1,4 @@
+#include <windows.h> 
 #include "Remodel.hpp"
 #include "gtest/gtest.h"
 
@@ -768,7 +769,7 @@ class ModuleTest : public testing::Test {};
 TEST_F(ModuleTest, ModuleTest)
 {
     static int myStaticVar = 854693;
-    auto mainModulePtr = platform::obtainModuleHandle(nullptr);
+    auto mainModulePtr = GetModuleHandleA(nullptr);
     auto mainModule = Module::getModule(nullptr);
 
     EXPECT_TRUE(mainModule);
@@ -822,12 +823,24 @@ TEST_F(FunctionTest, FunctionTest)
     EXPECT_EQ(add(1423,  6879), wrapAdd(1423, 6879 ));
     EXPECT_EQ(add(-1423, 6879), wrapAdd(-1423, 6879));
 
+    EXPECT_EQ(add(1423, 6879), wrapAdd.fastcall(1423, 6879));
+
+    if constexpr (sizeof(void*) == 8)
+    	EXPECT_EQ(add(-1423, 6879), wrapAdd.stdcall(-1423, 6879));
+
+    EXPECT_EQ(add(1423, 6879), wrapAdd.cdeclcall(1423, 6879));
+    EXPECT_EQ(add(-1423, 6879), wrapAdd.vectorcall(-1423, 6879));
+
     int a = 0;
     wrapMagic(a);
     EXPECT_EQ(42, a);
 
     EXPECT_EQ(15, cVarArgSum    (3, 1, 5, 9));
     EXPECT_EQ(15, wrapCVarArgSum(3, 1, 5, 9));
+
+    EXPECT_EQ(15, wrapCVarArgSum.cdeclcall(3, 1, 5, 9));
+    EXPECT_EQ(15, wrapCVarArgSum.fastcall(3, 1, 5, 9));
+    EXPECT_EQ(15, wrapCVarArgSum.vectorcall(3, 1, 5, 9));
 }
 
 // ============================================================================================== //
@@ -837,6 +850,7 @@ TEST_F(FunctionTest, FunctionTest)
 // We rely on the fact that the compiler handles member-function-pointers as regular function
 // pointers on the hood here (which is not guaranteed by the standard), so let's just perform
 // this test with MSVC for now (where we know that the stuff is implemented this way).
+#define ZYCORE_MSVC
 #ifdef ZYCORE_MSVC
 
 class MemberFunctionTest : public testing::Test

@@ -1,31 +1,23 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.30)
 cmake_policy(SET CMP0054 NEW)
 project(remodel_test)
 
-option(REMODEL_TESTING "Build all tests." OFF)
-set(REMODEL_ZYCORE_ROOT "dependencies/zycore" CACHE STRING
-	"ZyCore library root directory.")
-set(REMODEL_ZYCORE_BIN_DIR CACHE STRING
-	"ZyCore binary directory (only required for out-of-source builds).")
-
-set(ZYCORE_HEADER_ONLY TRUE CACHE BOOL "")
-add_subdirectory(${REMODEL_ZYCORE_ROOT} ${REMODEL_ZYCORE_BIN_DIR})
+option(REMODEL_TESTING "Build all tests." ON)
 
 add_library(remodel INTERFACE)
 target_include_directories(remodel INTERFACE include/)
-target_link_libraries(remodel INTERFACE Zycore)
 
 if (REMODEL_TESTING)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 		foreach (flag_var
 	    		CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
 	            CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-	     	string(REGEX REPLACE "/(LD|(M(T|D)))d?( +|$)" "/MD " new_var ${${cur_var}})
+	     	string(REGEX REPLACE "/(LD|(M(T|D)))d?( +|$)" "/MD " new_var "${cur_var_val}")
 	     	string(REPLACE "/W3" "-W4" new_var "${new_var}")
 	     	set(${cur_var} ${new_var} CACHE STRING "" FORCE)
 	 	endforeach ()
     else ()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14" CACHE STRING "" FORCE)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++23" CACHE STRING "" FORCE)
 	endif ()
 
 	enable_testing()

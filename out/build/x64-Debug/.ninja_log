@@ -1,0 +1,7 @@
+# ninja log v6
+16	1336	7739708760869519	testing/gtest-1.7.0/CMakeFiles/gtest_main.dir/src/gtest_main.cc.obj	8545aff30dd54b1f
+21	2704	7739708760923600	CMakeFiles/remodel_run_unittests.dir/testing/test.cpp.obj	19efb9844b7a9003
+11	3108	7739708760818158	testing/gtest-1.7.0/CMakeFiles/gtest.dir/src/gtest-all.cc.obj	61d978ef233a0869
+3109	3601	7739708791797898	lib/gtest.lib	89b28b47b8d04fce
+3601	3788	7739708796721478	lib/gtest_main.lib	9962492c9911c1f9
+3788	5179	7739708798590734	remodel_run_unittests.exe	3a475b3fbf7d2e4
