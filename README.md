@@ -4,6 +4,10 @@ copy Remodel.hpp and Platform.hpp into your project. (both can be found inside t
 
 in your project you have to include windows.h before Remodel.hpp
 
+or define NO_WINDOWS_HEADER like so
+
+<img width="353" height="73" alt="image" src="https://github.com/user-attachments/assets/073ae632-52bd-4e44-8aa2-249e91976114" />
+
 also make sure to build with at least c++17
 
 example:
