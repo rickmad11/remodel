@@ -1643,6 +1643,8 @@ public:
 /**
  * @brief   Allows declaration of global variables as fields using module relative addresses.
  */
+#ifdef NO_WINDOWS_HEADER
+#else
 class Module : public ClassWrapper
 {
     REMODEL_WRAPPER(Module)
@@ -1659,7 +1661,7 @@ public:
         return {wrapper_cast<Module>(modulePtr)};
     }
 };
-
+#endif
 // ============================================================================================== //
 
 } // namespace remodel
