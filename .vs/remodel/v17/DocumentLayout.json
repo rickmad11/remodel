@@ -7,12 +7,12 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:testing\\test.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|F:\\Repos\\remodel\\include\\Platform.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:include\\Platform.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|F:\\Repos\\remodel\\include\\Remodel.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:include\\Remodel.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|F:\\Repos\\remodel\\include\\Platform.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:include\\Platform.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|F:\\Repos\\remodel\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
@@ -118,7 +118,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Platform.hpp",
               "DocumentMoniker": "F:\\Repos\\remodel\\include\\Platform.hpp",
               "RelativeDocumentMoniker": "include\\Platform.hpp",
@@ -178,15 +178,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "Remodel.hpp",
               "DocumentMoniker": "F:\\Repos\\remodel\\include\\Remodel.hpp",
               "RelativeDocumentMoniker": "include\\Remodel.hpp",
               "ToolTip": "F:\\Repos\\remodel\\include\\Remodel.hpp",
               "RelativeToolTip": "include\\Remodel.hpp",
-              "ViewState": "AgIAAF4GAAAAAAAAAAAAAEsFAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAKQDAAAAAAAAAAAAALADAABkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-07-11T16:40:08.868Z"
+              "WhenOpened": "2025-07-11T16:40:08.868Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -267,7 +268,7 @@
               "RelativeDocumentMoniker": "testing\\test.cpp",
               "ToolTip": "F:\\Repos\\remodel\\testing\\test.cpp",
               "RelativeToolTip": "testing\\test.cpp",
-              "ViewState": "AgIAACUDAAAAAAAAAAAnwDADAAAHAAAAAAAAAA==",
+              "ViewState": "AgIAAA4DAAAAAAAAAAAAAB8DAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-07-11T16:05:39.509Z",
               "EditorCaption": ""

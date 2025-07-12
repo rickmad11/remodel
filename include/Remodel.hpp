@@ -845,6 +845,9 @@ protected:
         , m_parent{parent}
     {}
 
+	//required for the REMODEL_FIELDIMPL_FORWARD_CTORS macro
+    FieldBase() = default;
+
     /**
      * @brief   Deleted copy constructor.
      */
@@ -940,7 +943,6 @@ protected:
         {}                                                                                         \
                                                                                                    \
         explicit FieldImpl(const FieldImpl& other)                                                 \
-            : FieldBase{other}                                                                     \
         {}                                                                                         \
     private:
 
