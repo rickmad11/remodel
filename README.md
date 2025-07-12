@@ -1,4 +1,16 @@
-remodel library [![Build Status](https://travis-ci.org/zyantific/remodel.svg?branch=master)](https://travis-ci.org/zyantific/remodel)
+How to use:
+
+copy Remodel.hpp and Platform.hpp into your project. (both can be found inside the include folder)
+
+in your project you have to include windows.h before Remodel.hpp
+
+also make sure to build with at least c++17
+
+example:
+<img width="1082" height="1057" alt="image" src="https://github.com/user-attachments/assets/eb2d5d76-58aa-49d2-b769-682340573626" />
+
+
+remodel library 
 ===============
 
 remodel is a lightweight C++ library that allows interaction with applications
